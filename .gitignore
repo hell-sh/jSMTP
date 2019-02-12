@@ -1,0 +1,5 @@
+.idea/
+out/
+target/
+dependency-reduced-pom.xml
+jSMTP.iml
