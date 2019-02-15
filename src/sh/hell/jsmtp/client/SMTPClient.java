@@ -97,19 +97,21 @@ public class SMTPClient
 		this.sslSocketFactory = sslSocketFactory;
 	}
 
-	public static void sendMail(String from, String to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
+	public static SMTPResponse sendMail(String from, String to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
 	{
-		sendMail(SMTPAddress.fromText(from), SMTPAddress.fromText(to), subject, content);
+		return sendMail(SMTPAddress.fromText(from), SMTPAddress.fromText(to), subject, content);
 	}
 
-	public static void sendMail(SMTPAddress from, SMTPAddress to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
+	public static SMTPResponse sendMail(SMTPAddress from, SMTPAddress to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
 	{
 		SMTPClient client = SMTPClient.fromAddress(to);
 		if(client == null)
 		{
 			throw new SMTPException("Unable to find server for " + to.mail);
 		}
-		client.hello(from.getDomain()).from(from).to(to).subject(subject).send(content);
+		SMTPResponse response = client.hello(from.getDomain()).from(from).to(to).subject(subject).send(content);
+		client.close();
+		return response;
 	}
 
 	public static SMTPClient fromAddress(SMTPAddress address) throws NamingException
@@ -435,7 +437,7 @@ public class SMTPClient
 		return this;
 	}
 
-	public SMTPClient send(SMTPContent _body) throws IOException, SMTPException
+	public SMTPResponse send(SMTPContent _body) throws IOException, SMTPException
 	{
 		write("DATA").flush();
 		SMTPResponse response = readResponse();
@@ -478,6 +480,6 @@ public class SMTPClient
 		{
 			throw new SMTPException("Server refused to accept email: " + response);
 		}
-		return this;
+		return response;
 	}
 }
