@@ -116,7 +116,7 @@ public class Tests
 		assertNotNull(client);
 		assertEquals(welcome, client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost");
+		client.hello("localhost", true);
 		assertTrue(client.extendedSMTP);
 		assertEquals("localhost", client.serverHostname);
 		assertTrue(client.isEncrypted());

@@ -20,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -281,9 +282,21 @@ public class SMTPClient
 								InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
 								socket = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
 								((SSLSocket) socket).setUseClientMode(true);
-								((SSLSocket) socket).setEnabledProtocols(((SSLSocket) socket).getSupportedProtocols());
+								ArrayList<String> _protocols = new ArrayList<>();
+								for(String protocol : ((SSLSocket) socket).getSupportedProtocols())
+								{
+									if(!protocol.equals("TLSv1.3"))
+									{
+										_protocols.add(protocol);
+									}
+								}
+								((SSLSocket) socket).setEnabledProtocols(_protocols.toArray(new String[0]));
 								((SSLSocket) socket).setEnabledCipherSuites(((SSLSocket) socket).getSupportedCipherSuites());
 								((SSLSocket) socket).startHandshake();
+								if(requireEncryption && ((SSLSocket) socket).getSession().getCipherSuite().startsWith("TLS handshake failed"))
+								{
+									throw new TLSNegotiationFailedException(((SSLSocket) socket).getSession().getCipherSuite());
+								}
 								logger.debug(serverIP + " = Cipher suite: " + ((SSLSocket) socket).getSession().getCipherSuite());
 								scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
 								writer = new OutputStreamWriter(socket.getOutputStream());
