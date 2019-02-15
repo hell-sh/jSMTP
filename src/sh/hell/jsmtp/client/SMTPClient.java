@@ -482,4 +482,30 @@ public class SMTPClient
 		}
 		return response;
 	}
+
+	public void close()
+	{
+		try
+		{
+			write("QUIT").flush();
+		}
+		catch(IOException ignored)
+		{
+		}
+		try
+		{
+			writer.close();
+		}
+		catch(IOException ignored)
+		{
+		}
+		try
+		{
+			socket.close();
+		}
+		catch(IOException ignored)
+		{
+		}
+		scanner.close();
+	}
 }

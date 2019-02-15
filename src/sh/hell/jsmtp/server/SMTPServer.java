@@ -145,34 +145,7 @@ public class SMTPServer
 			{
 				for(SMTPSession session : sessions)
 				{
-					try
-					{
-						session.write("421 Shutting down.");
-						session.writer.flush();
-					}
-					catch(IOException ignored)
-					{
-
-					}
-					try
-					{
-						session.writer.close();
-					}
-					catch(IOException ignored)
-					{
-					}
-					try
-					{
-						session.socket.close();
-					}
-					catch(IOException ignored)
-					{
-					}
-					if(session.scanner != null)
-					{
-						session.scanner.close();
-					}
-					session.interrupt();
+					session.close();
 				}
 				sessions.clear();
 			}

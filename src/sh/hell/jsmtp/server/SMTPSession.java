@@ -24,9 +24,9 @@ public class SMTPSession extends Thread
 	private final SMTPServer server;
 	public String hostname;
 	public boolean extendedSMTP = false;
-	Socket socket;
-	OutputStreamWriter writer;
-	Scanner scanner;
+	private Socket socket;
+	private OutputStreamWriter writer;
+	private Scanner scanner;
 	private SMTPMail buildingMail;
 
 	SMTPSession(SMTPServer server, Socket socket) throws IOException
@@ -356,6 +356,46 @@ public class SMTPSession extends Thread
 		{
 			server.sessions.remove(this);
 		}
+	}
+
+	public void close()
+	{
+		this.close(null);
+	}
+
+	public void close(String message)
+	{
+		if(message != null)
+		{
+			try
+			{
+				write("421 Shutting down.");
+				writer.flush();
+			}
+			catch(IOException ignored)
+			{
+
+			}
+		}
+		try
+		{
+			writer.close();
+		}
+		catch(IOException ignored)
+		{
+		}
+		try
+		{
+			socket.close();
+		}
+		catch(IOException ignored)
+		{
+		}
+		if(scanner != null)
+		{
+			scanner.close();
+		}
+		this.interrupt();
 	}
 
 	public boolean isEncrypted()
