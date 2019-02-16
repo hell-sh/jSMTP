@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -137,15 +136,7 @@ public class SMTPSession extends Thread
 									InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
 									socket = server.sslSocketFactory.createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
 									((SSLSocket) socket).setUseClientMode(false);
-									ArrayList<String> _protocols = new ArrayList<>();
-									for(String protocol : ((SSLSocket) socket).getSupportedProtocols())
-									{
-										if(!protocol.equals("TLSv1.3"))
-										{
-											_protocols.add(protocol);
-										}
-									}
-									((SSLSocket) socket).setEnabledProtocols(_protocols.toArray(new String[0]));
+									((SSLSocket) socket).setEnabledProtocols(((SSLSocket) socket).getSupportedProtocols());
 									((SSLSocket) socket).setEnabledCipherSuites(((SSLSocket) socket).getSupportedCipherSuites());
 									((SSLSocket) socket).startHandshake();
 									logger.debug((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = Cipher suite: " + ((SSLSocket) socket).getSession().getCipherSuite());

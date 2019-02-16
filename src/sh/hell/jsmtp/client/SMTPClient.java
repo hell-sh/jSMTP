@@ -10,7 +10,6 @@ import sh.hell.jsmtp.exceptions.TLSNegotiationFailedException;
 import javax.naming.NamingException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +31,8 @@ public class SMTPClient
 	public final String serverIP;
 	public final short serverPort;
 	public final String serverWelcomeMessage;
-	private final HashMap<String, String> emailHeaders = new HashMap<>();
-	public SSLSocketFactory sslSocketFactory = null;
+	public final HashMap<String, String> emailHeaders = new HashMap<>();
+	public final TrustManager[] trustManagers;
 	public Scanner scanner;
 	public OutputStreamWriter writer;
 	public String hostname;
@@ -44,19 +42,7 @@ public class SMTPClient
 
 	public SMTPClient(String serverIP, int serverPort) throws IOException, SMTPException
 	{
-		logger.info("Connecting to " + serverIP + ":" + serverPort + "...");
-		this.serverIP = serverIP;
-		this.serverPort = (short) serverPort;
-		this.socket = new Socket(serverIP, serverPort);
-		this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
-		this.writer = new OutputStreamWriter(socket.getOutputStream());
-		SMTPResponse response = readResponse();
-		if(!response.status.equals("220"))
-		{
-			throw new SMTPException("Server declined connection: " + response.toString());
-		}
-		this.serverWelcomeMessage = response.toString().substring(4);
-		final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager()
+		this(serverIP, serverPort, new TrustManager[]{new X509TrustManager()
 		{
 			public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
 			{
@@ -70,32 +56,25 @@ public class SMTPClient
 			{
 				return null;
 			}
-		}};
-		try
-		{
-			final SSLContext sctx = SSLContext.getInstance("TLSv1.2");
-			sctx.init(null, trustAllCerts, new SecureRandom());
-			this.sslSocketFactory = sctx.getSocketFactory();
-		}
-		catch(GeneralSecurityException ignored)
-		{
-		}
+		}});
 	}
 
-	public SMTPClient(String serverIP, int serverPort, SSLSocketFactory sslSocketFactory) throws IOException, SMTPException
+	public SMTPClient(String serverIP, int serverPort, TrustManager[] trustManagers) throws IOException, SMTPException
 	{
 		logger.info("Connecting to " + serverIP + ":" + serverPort + "...");
 		this.serverIP = serverIP;
 		this.serverPort = (short) serverPort;
 		this.socket = new Socket(serverIP, serverPort);
+		this.socket.setSoTimeout(3000);
 		this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
+		this.writer = new OutputStreamWriter(socket.getOutputStream());
 		SMTPResponse response = readResponse();
 		if(!response.status.equals("220"))
 		{
 			throw new SMTPException("Server declined connection: " + response.toString());
 		}
 		this.serverWelcomeMessage = response.toString().substring(4);
-		this.sslSocketFactory = sslSocketFactory;
+		this.trustManagers = trustManagers;
 	}
 
 	public static SMTPResponse sendMail(String from, String to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
@@ -280,17 +259,11 @@ public class SMTPClient
 							try
 							{
 								InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
-								socket = ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
+								final SSLContext sctx = SSLContext.getInstance("TLSv1.2");
+								sctx.init(null, this.trustManagers, new SecureRandom());
+								socket = sctx.getSocketFactory().createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
 								((SSLSocket) socket).setUseClientMode(true);
-								ArrayList<String> _protocols = new ArrayList<>();
-								for(String protocol : ((SSLSocket) socket).getSupportedProtocols())
-								{
-									if(!protocol.equals("TLSv1.3"))
-									{
-										_protocols.add(protocol);
-									}
-								}
-								((SSLSocket) socket).setEnabledProtocols(_protocols.toArray(new String[0]));
+								((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.2"});
 								((SSLSocket) socket).setEnabledCipherSuites(((SSLSocket) socket).getSupportedCipherSuites());
 								((SSLSocket) socket).startHandshake();
 								if(requireEncryption && ((SSLSocket) socket).getSession().getCipherSuite().startsWith("TLS handshake failed"))
@@ -302,7 +275,7 @@ public class SMTPClient
 								writer = new OutputStreamWriter(socket.getOutputStream());
 								hello(hostname);
 							}
-							catch(IOException e)
+							catch(IOException | GeneralSecurityException e)
 							{
 								if(requireEncryption)
 								{
