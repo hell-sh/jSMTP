@@ -401,6 +401,11 @@ public class SMTPSession extends Thread
 		this.interrupt();
 	}
 
+	public boolean isOpen()
+	{
+		return !socket.isClosed();
+	}
+
 	public boolean isEncrypted()
 	{
 		return (socket instanceof SSLSocket);

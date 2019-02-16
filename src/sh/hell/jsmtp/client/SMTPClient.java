@@ -158,6 +158,11 @@ public class SMTPClient
 		}
 	}
 
+	public boolean isOpen()
+	{
+		return !socket.isClosed();
+	}
+
 	public boolean isEncrypted()
 	{
 		return socket instanceof SSLSocket;
