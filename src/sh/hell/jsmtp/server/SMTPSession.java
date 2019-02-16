@@ -129,11 +129,11 @@ public class SMTPSession extends Thread
 							}
 							else
 							{
-								write("220 Cast the Transport Layer Security spell." + (server.eventHandler.isEncryptionRequired(this) ? " If this fails, I will disconnect." : ""));
+								write("220 Cast the Transport Layer Security spell.");
 								writer.flush();
 								try
 								{
-									final SSLSocket sslSocket = (SSLSocket) server.sslSocketFactory.createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), false);
+									final SSLSocket sslSocket = (SSLSocket) server.sslSocketFactory.createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), true);
 									sslSocket.setUseClientMode(false);
 									sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
 									sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
@@ -151,10 +151,7 @@ public class SMTPSession extends Thread
 								catch(IOException | TLSNegotiationFailedException e)
 								{
 									logger.info((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = TLS handshake failed: " + e.getMessage());
-									if(server.eventHandler.isEncryptionRequired(this))
-									{
-										break;
-									}
+									break;
 								}
 							}
 						}

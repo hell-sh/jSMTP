@@ -6,7 +6,6 @@ import sh.hell.jsmtp.content.SMTPEncoding;
 import sh.hell.jsmtp.content.SMTPMultipartContent;
 import sh.hell.jsmtp.content.SMTPTextContent;
 import sh.hell.jsmtp.exceptions.SMTPException;
-import sh.hell.jsmtp.exceptions.TLSNegotiationFailedException;
 import sh.hell.jsmtp.server.SMTPEventHandler;
 import sh.hell.jsmtp.server.SMTPMail;
 import sh.hell.jsmtp.server.SMTPServer;
@@ -56,7 +55,7 @@ public class Tests
 		final String welcome = "Wêlcömé";
 		final String textMessage = "Hêlló, wörld!\n\n.\n";
 		final String htmlMessage = "<b>Hêlló, wörld!</b>\n\n.\n";
-		final boolean requireEncryption = !System.getProperty("java.version").startsWith("11"); // TLS does not work in Java 11.0.2, and I've been losing my time and sanity over it, so I'm calling it a Java bug, and will allow encryption to fail on Java 11.
+		final boolean useEncryption = !System.getProperty("java.version").startsWith("11"); // TLS does not work in Java 11.0.2, and I've been losing my time and sanity over it, so I'm calling it a Java bug, and will allow encryption to fail on Java 11.
 		// Starting server
 		SMTPServer server = new SMTPServer(new SMTPEventHandler()
 		{
@@ -70,12 +69,6 @@ public class Tests
 			public String getHostname(SMTPSession session)
 			{
 				return "localhost";
-			}
-
-			@Override
-			public boolean isEncryptionRequired(SMTPSession session)
-			{
-				return requireEncryption;
 			}
 
 			@Override
@@ -117,22 +110,15 @@ public class Tests
 		assertNotNull(client);
 		assertEquals(welcome, client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost", requireEncryption);
+		client.hello("localhost", useEncryption);
 		assertTrue(client.extendedSMTP);
 		assertEquals("localhost", client.serverHostname);
-		if(requireEncryption)
-		{
-			assertTrue(client.isEncrypted());
-		}
+		assertTrue(!useEncryption || client.isEncrypted());
 		// Defining sender which should be denied
 		boolean failed = false;
 		try
 		{
 			client.from(new SMTPAddress("denied@localhost"));
-		}
-		catch(TLSNegotiationFailedException e)
-		{
-			throw e;
 		}
 		catch(SMTPException ignored)
 		{

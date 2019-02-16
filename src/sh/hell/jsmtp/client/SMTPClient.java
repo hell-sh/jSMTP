@@ -217,19 +217,19 @@ public class SMTPClient
 
 	public SMTPClient hello(String hostname) throws IOException, SMTPException
 	{
-		return hello(hostname, false);
+		return hello(hostname, true);
 	}
 
 	/**
 	 * Sends EHLO (or HELO) to the server, followed by STARTTLS, if supported.
 	 *
-	 * @param hostname          The hostname of the machine sending the email.
-	 * @param requireEncryption If true, an exception will be thrown if STARTTLS is not supported.
+	 * @param hostname      The hostname of the machine sending the email.
+	 * @param useEncryption If false, STARTTLS capabilities will not be acted upon.
 	 * @return this
-	 * @throws IOException                   If writing fails
-	 * @throws TLSNegotiationFailedException If requireEncryption is true but the TLS negotiation failed.
+	 * @throws IOException   If writing fails.
+	 * @throws SMTPException If an SMTP protocol error occurred.
 	 */
-	public SMTPClient hello(String hostname, boolean requireEncryption) throws SMTPException, IOException
+	public SMTPClient hello(String hostname, boolean useEncryption) throws SMTPException, IOException
 	{
 		SMTPResponse response = null;
 		if(extendedSMTP)
@@ -251,7 +251,7 @@ public class SMTPClient
 		if(response.status.equals("250"))
 		{
 			this.serverHostname = response.lines.get(0);
-			if(!isEncrypted())
+			if(!isEncrypted() && useEncryption)
 			{
 				for(int i = 1; i < response.lines.size(); i++)
 				{
@@ -265,12 +265,12 @@ public class SMTPClient
 							{
 								final SSLContext sslContext = SSLContext.getInstance(Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 11 ? "TLSv1.3" : "TLSv1.2");
 								sslContext.init(null, this.trustManagers, new SecureRandom());
-								final SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), false);
+								final SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), true);
 								sslSocket.setUseClientMode(true);
 								sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
 								sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
 								sslSocket.startHandshake();
-								if(requireEncryption && sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
+								if(sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
 								{
 									throw new TLSNegotiationFailedException(sslSocket.getSession().getCipherSuite());
 								}
@@ -282,13 +282,10 @@ public class SMTPClient
 							}
 							catch(IOException | GeneralSecurityException e)
 							{
-								if(requireEncryption)
-								{
-									throw new TLSNegotiationFailedException(e.getMessage());
-								}
+								throw new TLSNegotiationFailedException(e.getMessage());
 							}
 						}
-						else if(requireEncryption)
+						else
 						{
 							throw new TLSNegotiationFailedException(starttls_response.toString());
 						}
@@ -299,10 +296,6 @@ public class SMTPClient
 		else
 		{
 			throw new SMTPException("Hello failed: " + response.toString());
-		}
-		if(requireEncryption && !isEncrypted())
-		{
-			throw new TLSNegotiationFailedException();
 		}
 		return this;
 	}
