@@ -390,13 +390,25 @@ public class SMTPClient
 	 * @param subject The subject of the email.
 	 * @return this
 	 */
-	public SMTPClient subject(String subject) throws SMTPException
+	public SMTPClient subject(String subject)
 	{
-		return this.addHeader("subject", subject);
+		try
+		{
+			return this.addHeader("subject", subject);
+		}
+		catch(SMTPException ignored)
+		{
+		}
+		return this;
 	}
 
 	/**
 	 * Creates a header or appends to its value if it already exists.
+	 *
+	 * @param name  The name of the header.
+	 * @param value The value of the header.
+	 * @return this
+	 * @throws SMTPException If the header name contains a colon, making it invalid.
 	 */
 	public SMTPClient addHeader(String name, String value) throws SMTPException
 	{
