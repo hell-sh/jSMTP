@@ -72,6 +72,12 @@ public class Tests
 			}
 
 			@Override
+			public boolean isEncryptionRequired(SMTPSession session)
+			{
+				return useEncryption;
+			}
+
+			@Override
 			public boolean isSenderAccepted(SMTPSession session, SMTPAddress address)
 			{
 				return !address.mail.equals("denied@localhost");
@@ -108,12 +114,14 @@ public class Tests
 		// Connecting to the server
 		SMTPClient client = new SMTPClient("localhost", server.listeners.get(0).socket.getLocalPort());
 		assertNotNull(client);
+		assertTrue(client.isOpen());
 		assertEquals(welcome, client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost", useEncryption);
+		client.hello("localhost");
 		assertTrue(client.extendedSMTP);
+		assertFalse(client.isEncrypted());
 		assertEquals("localhost", client.serverHostname);
-		assertTrue(!useEncryption || client.isEncrypted());
+		assertTrue(client.serverCapabilities.contains("STARTTLS"));
 		// Defining sender which should be denied
 		boolean failed = false;
 		try
@@ -124,6 +132,7 @@ public class Tests
 		{
 			failed = true;
 		}
+		assertTrue(!useEncryption || client.isEncrypted());
 		assertTrue(failed);
 		// Define recipient before sender was set
 		failed = false;

@@ -19,6 +19,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,12 +32,13 @@ public class SMTPClient
 	public final String serverIP;
 	public final short serverPort;
 	public final String serverWelcomeMessage;
+	public String serverHostname;
+	public final ArrayList<String> serverCapabilities = new ArrayList<>();
 	public final HashMap<String, String> emailHeaders = new HashMap<>();
 	public final TrustManager[] trustManagers;
 	public Scanner scanner;
 	public OutputStreamWriter writer;
 	public String hostname;
-	public String serverHostname;
 	public boolean extendedSMTP = true;
 	private Socket socket;
 
@@ -215,21 +217,15 @@ public class SMTPClient
 		return this;
 	}
 
-	public SMTPClient hello(String hostname) throws IOException, SMTPException
-	{
-		return hello(hostname, true);
-	}
-
 	/**
-	 * Sends EHLO (or HELO) to the server, followed by STARTTLS, if supported.
+	 * Sends EHLO (or HELO) to the server.
 	 *
-	 * @param hostname      The hostname of the machine sending the email.
-	 * @param useEncryption If false, STARTTLS capabilities will not be acted upon.
+	 * @param hostname The hostname of the machine sending the email.
 	 * @return this
 	 * @throws IOException   If writing fails.
 	 * @throws SMTPException If an SMTP protocol error occurred.
 	 */
-	public SMTPClient hello(String hostname, boolean useEncryption) throws SMTPException, IOException
+	public SMTPClient hello(String hostname) throws SMTPException, IOException
 	{
 		SMTPResponse response = null;
 		if(extendedSMTP)
@@ -251,45 +247,12 @@ public class SMTPClient
 		if(response.status.equals("250"))
 		{
 			this.serverHostname = response.lines.get(0);
-			if(!isEncrypted() && useEncryption)
+			synchronized(this.serverCapabilities)
 			{
+				this.serverCapabilities.clear();
 				for(int i = 1; i < response.lines.size(); i++)
 				{
-					if(response.lines.get(i).equalsIgnoreCase("STARTTLS"))
-					{
-						write("STARTTLS").flush();
-						SMTPResponse starttls_response = readResponse();
-						if(starttls_response.status.equals("220"))
-						{
-							try
-							{
-								final SSLContext sslContext = SSLContext.getInstance(Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 11 ? "TLSv1.3" : "TLSv1.2");
-								sslContext.init(null, this.trustManagers, new SecureRandom());
-								final SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), true);
-								sslSocket.setUseClientMode(true);
-								sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
-								sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
-								sslSocket.startHandshake();
-								if(sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
-								{
-									throw new TLSNegotiationFailedException(sslSocket.getSession().getCipherSuite());
-								}
-								logger.debug(serverIP + " = Cipher suite: " + sslSocket.getSession().getCipherSuite());
-								this.socket = sslSocket;
-								this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
-								this.writer = new OutputStreamWriter(socket.getOutputStream());
-								this.hello(hostname);
-							}
-							catch(IOException | GeneralSecurityException e)
-							{
-								throw new TLSNegotiationFailedException(e.getMessage());
-							}
-						}
-						else
-						{
-							throw new TLSNegotiationFailedException(starttls_response.toString());
-						}
-					}
+					this.serverCapabilities.add(response.lines.get(i).toUpperCase());
 				}
 			}
 		}
@@ -300,7 +263,55 @@ public class SMTPClient
 		return this;
 	}
 
-	public SMTPClient from(SMTPAddress smtpAddress) throws SMTPException, IOException
+	public SMTPClient startTLS() throws SMTPException, IOException
+	{
+		if(serverCapabilities.contains("STARTTLS"))
+		{
+			write("STARTTLS").flush();
+			SMTPResponse starttls_response = readResponse();
+			if(starttls_response.status.equals("220"))
+			{
+				try
+				{
+					final SSLContext sslContext = SSLContext.getInstance(Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 11 ? "TLSv1.3" : "TLSv1.2");
+					sslContext.init(null, this.trustManagers, new SecureRandom());
+					final SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), true);
+					sslSocket.setUseClientMode(true);
+					sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
+					sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+					sslSocket.startHandshake();
+					if(sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
+					{
+						throw new TLSNegotiationFailedException(sslSocket.getSession().getCipherSuite());
+					}
+					logger.debug(serverIP + " = Cipher suite: " + sslSocket.getSession().getCipherSuite());
+					this.socket = sslSocket;
+					this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
+					this.writer = new OutputStreamWriter(socket.getOutputStream());
+					this.hello(hostname);
+				}
+				catch(IOException | GeneralSecurityException e)
+				{
+					throw new TLSNegotiationFailedException(e.getMessage());
+				}
+			}
+			else
+			{
+				throw new TLSNegotiationFailedException(starttls_response.toString());
+			}
+		}
+		return this;
+	}
+
+	/**
+	 * Specifies the given address as the email sender, and starts TLS if the server requires it.
+	 *
+	 * @param smtpAddress The sender address.
+	 * @return this
+	 * @throws IOException   If writing fails.
+	 * @throws SMTPException If an SMTP protocol error occurred.
+	 */
+	public SMTPClient from(SMTPAddress smtpAddress) throws IOException, SMTPException
 	{
 		if(!smtpAddress.isValid())
 		{
@@ -311,7 +322,12 @@ public class SMTPClient
 		SMTPResponse response = readResponse();
 		if(!response.status.equals("250"))
 		{
-			throw new SMTPException("Server denied " + smtpAddress.mail + " as sender address: " + response.toString());
+			if(!response.status.equals("503") || isEncrypted())
+			{
+				throw new SMTPException("Server denied " + smtpAddress.mail + " as sender address: " + response.toString());
+			}
+			this.startTLS();
+			this.from(smtpAddress);
 		}
 		return this;
 	}
