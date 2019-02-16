@@ -1,4 +1,4 @@
-# jSMTP
+# jSMTP [![Build Status](https://travis-ci.org/hell-sh/jSMTP.svg?branch=master)](https://travis-ci.org/hell-sh/jSMTP)
 
 A **good** Java implementation of SMTP and extended SMTP.
 
