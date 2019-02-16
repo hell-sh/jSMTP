@@ -247,7 +247,7 @@ extends java.lang.Object</pre>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-boolean-">hello</a></span>(java.lang.String&nbsp;hostname,
-     boolean&nbsp;requireEncryption)</code>
+    boolean&nbsp;useEncryption)</code>
 <div class="block">Sends EHLO (or HELO) to the server, followed by STARTTLS, if supported.</div>
 </td>
 </tr>
@@ -627,20 +627,22 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>hello</h4>
 <pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;hello(java.lang.String&nbsp;hostname,
-                        boolean&nbsp;requireEncryption)
+                        boolean&nbsp;useEncryption)
                  throws <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a>,
                         java.io.IOException</pre>
 <div class="block">Sends EHLO (or HELO) to the server, followed by STARTTLS, if supported.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>hostname</code> - The hostname of the machine sending the email.</dd>
-<dd><code>requireEncryption</code> - If true, an exception will be thrown if STARTTLS is not supported.</dd>
+    <dd><code>useEncryption</code> - If false, STARTTLS capabilities will not be acted upon.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>this</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.io.IOException</code> - If writing fails</dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/TLSNegotiationFailedException.html" title="class in sh.hell.jsmtp.exceptions">TLSNegotiationFailedException</a></code> - If requireEncryption is true but the TLS negotiation failed.</dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
+    <dd><code>java.io.IOException</code> - If writing fails.</dd>
+    <dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html"
+                 title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code> - If an SMTP protocol error
+        occurred.
+    </dd>
 </dl>
 </li>
 </ul>
