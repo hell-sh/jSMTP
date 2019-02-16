@@ -29,20 +29,13 @@ public class SMTPServer
 
 	public SMTPServer(SMTPEventHandler eventHandler)
 	{
-		this(eventHandler, null);
+		this(eventHandler, (SSLSocketFactory) SSLSocketFactory.getDefault());
 	}
 
 	public SMTPServer(SMTPEventHandler eventHandler, SSLSocketFactory sslSocketFactory)
 	{
 		this.eventHandler = eventHandler;
-		if(sslSocketFactory == null)
-		{
-			this.sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		}
-		else
-		{
-			this.sslSocketFactory = sslSocketFactory;
-		}
+		this.sslSocketFactory = sslSocketFactory;
 	}
 
 	public SMTPServer(SMTPEventHandler eventHandler, String keyStoreFile, String keyStorePassword) throws IOException, GeneralSecurityException
@@ -62,7 +55,7 @@ public class SMTPServer
 				return null;
 			}
 		}};
-		final SSLContext sctx = SSLContext.getInstance("TLSv1.2");
+		final SSLContext sslContext = SSLContext.getInstance(Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 11 ? "TLSv1.3" : "TLSv1.2");
 		final char[] pw = keyStorePassword.toCharArray();
 		KeyStore ks = KeyStore.getInstance("JKS");
 		InputStream ksIs = new FileInputStream(keyStoreFile);
@@ -70,9 +63,9 @@ public class SMTPServer
 		ksIs.close();
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(ks, pw);
-		sctx.init(kmf.getKeyManagers(), trustAllCerts, new SecureRandom());
+		sslContext.init(kmf.getKeyManagers(), trustAllCerts, new SecureRandom());
 		this.eventHandler = eventHandler;
-		this.sslSocketFactory = sctx.getSocketFactory();
+		this.sslSocketFactory = sslContext.getSocketFactory();
 	}
 
 	public boolean isOnline()

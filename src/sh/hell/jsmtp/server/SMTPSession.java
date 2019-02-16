@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import sh.hell.jsmtp.SMTPAddress;
 import sh.hell.jsmtp.content.SMTPContent;
 import sh.hell.jsmtp.exceptions.InvalidAddressException;
+import sh.hell.jsmtp.exceptions.TLSNegotiationFailedException;
 
-import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocket;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -133,25 +133,28 @@ public class SMTPSession extends Thread
 								writer.flush();
 								try
 								{
-									InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
-									socket = server.sslSocketFactory.createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
-									((SSLSocket) socket).setUseClientMode(false);
-									((SSLSocket) socket).setEnabledProtocols(((SSLSocket) socket).getSupportedProtocols());
-									((SSLSocket) socket).setEnabledCipherSuites(((SSLSocket) socket).getSupportedCipherSuites());
-									((SSLSocket) socket).startHandshake();
-									logger.debug((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = Cipher suite: " + ((SSLSocket) socket).getSession().getCipherSuite());
-									writer = new OutputStreamWriter(socket.getOutputStream());
+									final SSLSocket sslSocket = (SSLSocket) server.sslSocketFactory.createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), false);
+									sslSocket.setUseClientMode(false);
+									sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
+									sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+									sslSocket.startHandshake();
+									if(sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
+									{
+										throw new TLSNegotiationFailedException(sslSocket.getSession().getCipherSuite());
+									}
+									logger.debug((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = Cipher suite: " + sslSocket.getSession().getCipherSuite());
+									this.socket = sslSocket;
+									this.writer = new OutputStreamWriter(socket.getOutputStream());
 									this.reset();
 									throw new UpgradeToTLSException();
 								}
-								catch(SSLHandshakeException e)
+								catch(IOException | TLSNegotiationFailedException e)
 								{
-									logger.debug((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = TLS handshake failed: " + e.getMessage());
+									logger.info((hostname == null ? socket.getRemoteSocketAddress().toString() : hostname) + " = TLS handshake failed: " + e.getMessage());
 									if(server.eventHandler.isEncryptionRequired(this))
 									{
 										break;
 									}
-									this.reset();
 								}
 							}
 						}

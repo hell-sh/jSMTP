@@ -258,22 +258,22 @@ public class SMTPClient
 						{
 							try
 							{
-								InetSocketAddress remoteAddress = (InetSocketAddress) socket.getRemoteSocketAddress();
-								final SSLContext sctx = SSLContext.getInstance("TLSv1.2");
-								sctx.init(null, this.trustManagers, new SecureRandom());
-								socket = sctx.getSocketFactory().createSocket(socket, remoteAddress.getHostName(), socket.getPort(), true);
-								((SSLSocket) socket).setUseClientMode(true);
-								((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.2"});
-								((SSLSocket) socket).setEnabledCipherSuites(((SSLSocket) socket).getSupportedCipherSuites());
-								((SSLSocket) socket).startHandshake();
-								if(requireEncryption && ((SSLSocket) socket).getSession().getCipherSuite().startsWith("TLS handshake failed"))
+								final SSLContext sslContext = SSLContext.getInstance(Integer.parseInt(System.getProperty("java.version").split("\\.")[0]) >= 11 ? "TLSv1.3" : "TLSv1.2");
+								sslContext.init(null, this.trustManagers, new SecureRandom());
+								final SSLSocket sslSocket = (SSLSocket) sslContext.getSocketFactory().createSocket(socket, ((InetSocketAddress) socket.getRemoteSocketAddress()).getHostName(), socket.getPort(), false);
+								sslSocket.setUseClientMode(true);
+								sslSocket.setEnabledProtocols(sslSocket.getSupportedProtocols());
+								sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+								sslSocket.startHandshake();
+								if(requireEncryption && sslSocket.getSession().getCipherSuite().startsWith("TLS handshake failed"))
 								{
-									throw new TLSNegotiationFailedException(((SSLSocket) socket).getSession().getCipherSuite());
+									throw new TLSNegotiationFailedException(sslSocket.getSession().getCipherSuite());
 								}
-								logger.debug(serverIP + " = Cipher suite: " + ((SSLSocket) socket).getSession().getCipherSuite());
-								scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
-								writer = new OutputStreamWriter(socket.getOutputStream());
-								hello(hostname);
+								logger.debug(serverIP + " = Cipher suite: " + sslSocket.getSession().getCipherSuite());
+								this.socket = sslSocket;
+								this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
+								this.writer = new OutputStreamWriter(socket.getOutputStream());
+								this.hello(hostname);
 							}
 							catch(IOException | GeneralSecurityException e)
 							{
