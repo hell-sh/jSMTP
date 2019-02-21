@@ -11,6 +11,8 @@ import sh.hell.jsmtp.server.SMTPMail;
 import sh.hell.jsmtp.server.SMTPServer;
 import sh.hell.jsmtp.server.SMTPSession;
 
+import java.io.IOException;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -48,6 +50,12 @@ public class Tests
 		SMTPClient.fromAddress(recipient1).hello("justsometestdomain.de").from(SMTPAddress.fromText("Sender <sender@justsometestdomain.de>")).to(recipient1).cc(SMTPAddress.fromText("Recipient 2 <jsmtp@trash-mail.com>")).bcc(SMTPAddress.fromText("Recipient 3 <jsmtp@trash-mail.com>")).stop();
 	}
 
+	@Test(timeout = 10000L)
+	public void testClientEncryption() throws IOException, SMTPException
+	{
+		new SMTPClient("m1.hell.sh", 25).hello("test.timmyrs.de", false).close();
+	}
+
 	@Test(timeout = 5000L)
 	public void testServerAndClient() throws Exception
 	{
@@ -55,7 +63,6 @@ public class Tests
 		final String welcome = "Wêlcömé";
 		final String textMessage = "Hêlló, wörld!\n\n.\n";
 		final String htmlMessage = "<b>Hêlló, wörld!</b>\n\n.\n";
-		final boolean useEncryption = !System.getProperty("java.version").startsWith("11"); // TLS does not work in Java 11.0.2, and I've been losing my time and sanity over it, so I'm calling it a Java bug, and will allow encryption to fail on Java 11.
 		// Starting server
 		SMTPServer server = new SMTPServer(new SMTPEventHandler()
 		{
@@ -69,12 +76,6 @@ public class Tests
 			public String getHostname(SMTPSession session)
 			{
 				return "localhost";
-			}
-
-			@Override
-			public boolean isEncryptionRequired(SMTPSession session)
-			{
-				return useEncryption;
 			}
 
 			@Override
@@ -117,11 +118,9 @@ public class Tests
 		assertTrue(client.isOpen());
 		assertEquals(welcome, client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost");
+		client.hello("localhost", System.getProperty("java.version").startsWith("11")); // TLS from localhost to localhost doesn't work starting in Java 11, but "testClientEncryption" above ensures that encryption works (at least in the client).
 		assertTrue(client.extendedSMTP);
-		assertFalse(client.isEncrypted());
 		assertEquals("localhost", client.serverHostname);
-		assertTrue(client.serverCapabilities.contains("STARTTLS"));
 		// Defining sender which should be denied
 		boolean failed = false;
 		try
@@ -132,7 +131,6 @@ public class Tests
 		{
 			failed = true;
 		}
-		assertTrue(!useEncryption || client.isEncrypted());
 		assertTrue(failed);
 		// Define recipient before sender was set
 		failed = false;
