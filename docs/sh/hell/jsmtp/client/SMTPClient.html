@@ -38,8 +38,7 @@ var methods = {
 	"i17": 10,
 	"i18": 10,
 	"i19": 10,
-	"i20": 10,
-	"i21": 10
+	"i20": 10
 };
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
@@ -272,7 +271,7 @@ extends java.lang.Object</pre>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-">hello</a></span>(java.lang.String&nbsp;hostname)</code>
-<div class="block">Sends EHLO (or HELO) to the server.</div>
+    <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
@@ -281,7 +280,7 @@ extends java.lang.Object</pre>
     <td class="colLast"><code><span class="memberNameLink"><a
             href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-boolean-">hello</a></span>(java.lang.String&nbsp;hostname,
         boolean&nbsp;ignoreEncryption)</code>
-        <div class="block">Sends EHLO (or HELO) to the server.</div>
+        <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
     </td>
 </tr>
     <tr id="i10" class="altColor">
@@ -319,24 +318,20 @@ extends java.lang.Object</pre>
         <a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;content)</code>&nbsp;</td>
 </tr>
 <tr id="i17" class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#stop--">stop</a></span>()</code>&nbsp;</td>
-</tr>
-<tr id="i18" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#subject-java.lang.String-">subject</a></span>(java.lang.String&nbsp;subject)</code>
 <div class="block">Sets the subject header or appends to it if already present.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+    <tr id="i18" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#to-sh.hell.jsmtp.SMTPAddress-">to</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)</code>&nbsp;</td>
 </tr>
-<tr id="i20" class="altColor">
+    <tr id="i19" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#verify-sh.hell.jsmtp.SMTPAddress-">verify</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;address)</code>&nbsp;</td>
 </tr>
-<tr id="i21" class="rowColor">
+    <tr id="i20" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#write-java.lang.String-">write</a></span>(java.lang.String&nbsp;message)</code>&nbsp;</td>
 </tr>
@@ -577,13 +572,13 @@ extends java.lang.Object</pre>
 <pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;fromServer(java.lang.String&nbsp;serverIP)</pre>
 </li>
 </ul>
-<a name="stop--">
+    <a name="close--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>stop</h4>
-<pre>public&nbsp;void&nbsp;stop()</pre>
+    <h4>close</h4>
+    <pre>public&nbsp;void&nbsp;close()</pre>
 </li>
 </ul>
 <a name="isOpen--">
@@ -656,7 +651,7 @@ extends java.lang.Object</pre>
                  throws java.io.IOException,
                         <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html"
                            title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<div class="block">Sends EHLO (or HELO) to the server.</div>
+    <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>hostname</code> - The hostname of the machine sending the email.</dd>
@@ -679,7 +674,7 @@ extends java.lang.Object</pre>
                  throws <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html"
                            title="class in sh.hell.jsmtp.exceptions">SMTPException</a>,
                         java.io.IOException</pre>
-    <div class="block">Sends EHLO (or HELO) to the server.</div>
+    <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
 <dl>
     <dt><span class="paramLabel">Parameters:</span></dt>
     <dd><code>hostname</code> - The hostname of the machine sending the email.</dd>
@@ -829,7 +824,7 @@ extends java.lang.Object</pre>
 <a name="send-sh.hell.jsmtp.content.SMTPContent-">
 <!--   -->
 </a>
-<ul class="blockList">
+    <ul class="blockListLast">
 <li class="blockList">
 <h4>send</h4>
 <pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;send(<a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;_body)
@@ -840,15 +835,6 @@ extends java.lang.Object</pre>
 <dd><code>java.io.IOException</code></dd>
 <dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
 </dl>
-</li>
-</ul>
-<a name="close--">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>close</h4>
-<pre>public&nbsp;void&nbsp;close()</pre>
 </li>
 </ul>
 </li>

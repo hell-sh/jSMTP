@@ -11,8 +11,6 @@ import sh.hell.jsmtp.server.SMTPMail;
 import sh.hell.jsmtp.server.SMTPServer;
 import sh.hell.jsmtp.server.SMTPSession;
 
-import java.io.IOException;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
@@ -46,14 +44,8 @@ public class Tests
 	@Test(timeout = 10000L)
 	public void testClientAgainstRemoteServer() throws Exception
 	{
-		SMTPAddress recipient1 = SMTPAddress.fromText("Recipient 1 <jsmtp@trash-mail.com>");
-		SMTPClient.fromAddress(recipient1).hello("justsometestdomain.de").from(SMTPAddress.fromText("Sender <sender@justsometestdomain.de>")).to(recipient1).cc(SMTPAddress.fromText("Recipient 2 <jsmtp@trash-mail.com>")).bcc(SMTPAddress.fromText("Recipient 3 <jsmtp@trash-mail.com>")).stop();
-	}
-
-	@Test(timeout = 10000L)
-	public void testClientEncryption() throws IOException, SMTPException
-	{
-		new SMTPClient("m1.hell.sh", 25).hello("test.timmyrs.de", false).close();
+		SMTPAddress recipient1 = SMTPAddress.fromText("Recipient 1 <jsmtp@existiert.net>");
+		SMTPClient.fromAddress(recipient1).hello("justsometestdomain.de", false).from(SMTPAddress.fromText("Sender <sender@justsometestdomain.de>")).to(recipient1).cc(SMTPAddress.fromText("Recipient 2 <cc@existiert.net>")).bcc(SMTPAddress.fromText("Recipient 3 <bcc@existiert.net>")).close();
 	}
 
 	@Test(timeout = 5000L)
@@ -118,7 +110,7 @@ public class Tests
 		assertTrue(client.isOpen());
 		assertEquals(welcome, client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost", System.getProperty("java.version").startsWith("11")); // TLS from localhost to localhost doesn't work starting in Java 11, but "testClientEncryption" above ensures that encryption works (at least in the client).
+		client.hello("localhost", System.getProperty("java.version").startsWith("11")); // TLS from localhost to localhost doesn't work starting in Java 11, but "testClientAgainstRemoteServer" above ensures that encryption works (at least in the client).
 		assertTrue(client.extendedSMTP);
 		assertEquals("localhost", client.serverHostname);
 		// Defining sender which should be denied
@@ -164,7 +156,7 @@ public class Tests
 		client.subject("Test");
 		client.send(new SMTPMultipartContent().addPart(new SMTPTextContent("text/plain", textMessage)).addPart(new SMTPTextContent("text/html", htmlMessage)));
 		// Stopping
-		client.stop();
+		client.close();
 		server.stop(true);
 	}
 }

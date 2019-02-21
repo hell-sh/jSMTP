@@ -139,25 +139,30 @@ public class SMTPClient
 		return null;
 	}
 
-	public void stop()
+	public void close()
 	{
+		try
+		{
+			write("QUIT").flush();
+		}
+		catch(IOException ignored)
+		{
+		}
 		try
 		{
 			writer.close();
 		}
 		catch(IOException ignored)
 		{
-
 		}
-		scanner.close();
 		try
 		{
 			socket.close();
 		}
 		catch(IOException ignored)
 		{
-
 		}
+		scanner.close();
 	}
 
 	public boolean isOpen()
@@ -218,7 +223,7 @@ public class SMTPClient
 	}
 
 	/**
-	 * Sends EHLO (or HELO) to the server.
+	 * Sends EHLO (or HELO) to the server, and STARTTLS if supported.
 	 *
 	 * @param hostname The hostname of the machine sending the email.
 	 * @return this
@@ -231,7 +236,7 @@ public class SMTPClient
 	}
 
 	/**
-	 * Sends EHLO (or HELO) to the server.
+	 * Sends EHLO (or HELO) to the server, and STARTTLS if supported.
 	 *
 	 * @param hostname The hostname of the machine sending the email.
 	 * @param ignoreEncryption Set to true to ignore STARTTLS capabilities.
@@ -497,31 +502,5 @@ public class SMTPClient
 			throw new SMTPException("Server refused to accept email: " + response);
 		}
 		return response;
-	}
-
-	public void close()
-	{
-		try
-		{
-			write("QUIT").flush();
-		}
-		catch(IOException ignored)
-		{
-		}
-		try
-		{
-			writer.close();
-		}
-		catch(IOException ignored)
-		{
-		}
-		try
-		{
-			socket.close();
-		}
-		catch(IOException ignored)
-		{
-		}
-		scanner.close();
 	}
 }
