@@ -1,8 +1,0 @@
-language: java
-cache:
-  directories:
-  - $HOME/.m2
-jdk:
-- oraclejdk8
-- openjdk11
-script: mvn test -B -P jsmtp -Dorg.slf4j.simpleLogger.defaultLogLevel=debug
