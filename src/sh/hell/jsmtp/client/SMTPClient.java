@@ -66,7 +66,8 @@ public class SMTPClient
 		logger.info("Connecting to " + serverIP + ":" + serverPort + "...");
 		this.serverIP = serverIP;
 		this.serverPort = (short) serverPort;
-		this.socket = new Socket(serverIP, serverPort);
+		this.socket = new Socket();
+		this.socket.connect(new InetSocketAddress(serverIP, serverPort), 3000);
 		this.socket.setSoTimeout(3000);
 		this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
 		this.writer = new OutputStreamWriter(socket.getOutputStream());
