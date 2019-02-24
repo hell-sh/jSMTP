@@ -2,8 +2,9 @@ package sh.hell.jsmtp.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sh.hell.jsmtp.SMTPAddress;
+import sh.hell.jsmtp.content.SMTPAddress;
 import sh.hell.jsmtp.content.SMTPContent;
+import sh.hell.jsmtp.content.SMTPMail;
 import sh.hell.jsmtp.exceptions.InvalidAddressException;
 import sh.hell.jsmtp.exceptions.TLSNegotiationFailedException;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class SMTPSession extends Thread
 {
 	private static final Logger logger = LoggerFactory.getLogger(SMTPSession.class);
@@ -79,7 +80,7 @@ public class SMTPSession extends Thread
 							}
 							else
 							{
-								write("501 Syntax: HELO hostname");
+								write("501 Syntax: HELO <hostname>");
 							}
 						}
 						else if(line.toUpperCase().startsWith("EHLO"))
@@ -90,17 +91,26 @@ public class SMTPSession extends Thread
 								hostname = arr[1];
 								extendedSMTP = true;
 								write("250-" + server.eventHandler.getHostname(this));
-								write("250-VRFY");
+								write("250-PIPELINING");
 								if(!isEncrypted())
 								{
 									write("250-STARTTLS");
+								}
+								final int sizeLimit = server.eventHandler.getSizeLimit(this);
+								if(sizeLimit > -1)
+								{
+									write("250-SIZE " + sizeLimit);
+								}
+								if(server.eventHandler.isVRFYallowed(this))
+								{
+									write("250-VRFY");
 								}
 								write("250-8BITMIME");
 								write("250 SMTPUTF8");
 							}
 							else
 							{
-								write("501 Syntax: EHLO hostname");
+								write("501 Syntax: EHLO <hostname>");
 							}
 						}
 						else if(line.toUpperCase().startsWith("NOOP"))
@@ -157,11 +167,7 @@ public class SMTPSession extends Thread
 						}
 						else if(line.toUpperCase().startsWith("MAIL"))
 						{
-							if(!line.toUpperCase().startsWith("MAIL FROM:<") || !line.endsWith(">"))
-							{
-								write("501 Syntax: MAIL FROM:<address>");
-							}
-							else if(!isEncrypted() && server.eventHandler.isEncryptionRequired(this))
+							if(!isEncrypted() && server.eventHandler.isEncryptionRequired(this))
 							{
 								write("503 Encryption is required. Send STARTTLS first.");
 							}
@@ -171,10 +177,46 @@ public class SMTPSession extends Thread
 							}
 							else
 							{
-								try
+								SMTPAddress sender = null;
+								String[] arr = line.split(" ");
+								int size = 0;
+								for(int i = 1; i < arr.length; i++)
 								{
-									SMTPAddress sender = SMTPAddress.fromText(line.substring(11, line.length() - 1));
-									if(server.eventHandler.isSenderAccepted(this, sender))
+									if(arr[i].toUpperCase().startsWith("FROM:<") && arr[i].endsWith(">"))
+									{
+										try
+										{
+											sender = SMTPAddress.fromText(arr[i].substring(6, arr[i].length() - 1));
+										}
+										catch(InvalidAddressException ignored)
+										{
+											write("553 " + arr[i].substring(5) + " is not a valid address.");
+										}
+
+									}
+									else if(arr[i].toUpperCase().startsWith("SIZE="))
+									{
+										try
+										{
+											size = Integer.valueOf(arr[i].substring(5));
+										}
+										catch(NumberFormatException ignored)
+										{
+										}
+									}
+								}
+								if(sender == null)
+								{
+									write("501 Syntax: MAIL FROM:<address>");
+								}
+								else
+								{
+									final int sizeLimit = server.eventHandler.getSizeLimit(this);
+									if(size > 0 && sizeLimit >= 0 && size > sizeLimit)
+									{
+										write("552 I don't accept " + size + "-byte emails.");
+									}
+									else if(server.eventHandler.isSenderAccepted(this, sender))
 									{
 										buildingMail = new SMTPMail();
 										buildingMail.sender = sender;
@@ -185,31 +227,61 @@ public class SMTPSession extends Thread
 										write("553 You're not allowed to send mail.");
 									}
 								}
-								catch(InvalidAddressException ignored)
-								{
-									write("553 " + line.substring(10) + " is not a valid address.");
-								}
 							}
 						}
 						else if(line.toUpperCase().startsWith("RCPT"))
 						{
-							if(!line.toUpperCase().startsWith("RCPT TO:<") || !line.endsWith(">"))
-							{
-								write("501 Syntax: RCPT TO:<address>");
-							}
-							else if(buildingMail == null)
+							if(buildingMail == null)
 							{
 								write("503 Send MAIL first.");
 							}
 							else
 							{
+								SMTPAddress recipient = null;
+								String[] arr = line.split(" ");
+								for(int i = 1; i < arr.length; i++)
+								{
+									if(arr[i].toUpperCase().startsWith("TO:<") && arr[i].endsWith(">"))
+									{
+										try
+										{
+											recipient = SMTPAddress.fromText(arr[i].substring(4, arr[i].length() - 1));
+										}
+										catch(InvalidAddressException ignored)
+										{
+											write("553 " + arr[i].substring(3) + " is not a valid address.");
+										}
+									}
+								}
+								if(recipient == null)
+								{
+									write("501 Syntax: RCPT TO:<address>");
+								}
+								else if(server.eventHandler.isRecipientAccepted(this, recipient))
+								{
+									buildingMail.recipients.add(recipient);
+									write("250 OK");
+								}
+								else
+								{
+									write("553 Can't deliver to " + recipient.toString());
+								}
+							}
+						}
+						else if(line.toUpperCase().startsWith("VRFY"))
+						{
+							if(server.eventHandler.isVRFYallowed(this))
+							{
+								if(!line.toUpperCase().startsWith("VRFY "))
+								{
+									write("501 Syntax error in parameters or arguments");
+								}
 								try
 								{
-									SMTPAddress address = SMTPAddress.fromText(line.substring(9, line.length() - 1));
+									SMTPAddress address = SMTPAddress.fromText(line.substring(5));
 									if(server.eventHandler.isRecipientAccepted(this, address))
 									{
-										buildingMail.recipients.add(address);
-										write("250 OK");
+										write("250 Can deliver to " + address.toString());
 									}
 									else
 									{
@@ -218,31 +290,13 @@ public class SMTPSession extends Thread
 								}
 								catch(InvalidAddressException ignored)
 								{
-									write("553 " + line.substring(8) + " is not a valid address.");
+
+									write("553 " + line.substring(5) + " is not a valid email address.");
 								}
 							}
-						}
-						else if(line.toUpperCase().startsWith("VRFY"))
-						{
-							if(!line.toUpperCase().startsWith("VRFY "))
+							else
 							{
-								write("501 Syntax: VRFY <address>");
-							}
-							try
-							{
-								SMTPAddress address = SMTPAddress.fromText(line.substring(5));
-								if(server.eventHandler.isRecipientAccepted(this, address))
-								{
-									write("250 Can deliver to " + address.toString());
-								}
-								else
-								{
-									write("553 Can't deliver to " + address.toString());
-								}
-							}
-							catch(InvalidAddressException ignored)
-							{
-								write("553 " + line.substring(5) + " is not a valid email address.");
+								write("502 Command not implemented");
 							}
 						}
 						else if(line.toUpperCase().startsWith("DATA"))
@@ -261,6 +315,7 @@ public class SMTPSession extends Thread
 								writer.flush();
 								boolean headersDefined = false;
 								String lastHeader = null;
+								final StringBuilder body = new StringBuilder();
 								do
 								{
 									String mailLine = scanner.next();
@@ -280,38 +335,62 @@ public class SMTPSession extends Thread
 										if(mailLine.length() == 0)
 										{
 											headersDefined = true;
+											continue;
 										}
-										else if(lastHeader != null)
+										if(lastHeader != null)
 										{
 											buildingMail.headers.put(lastHeader, buildingMail.headers.get(lastHeader) + mailLine.trim());
 										}
 									}
-									else
+									if(mailLine.length() > 0 && mailLine.startsWith("."))
 									{
-										if(mailLine.length() > 0 && mailLine.substring(0, 1).equals("."))
+										if(mailLine.length() == 1)
 										{
-											if(mailLine.length() == 1)
+											final String bodystr = body.toString();
+											if(bodystr.equals(""))
 											{
-												buildingMail.headers.put("date", SMTPContent.RFC2822.format(new Date()));
-												buildingMail.content = SMTPContent.from(buildingMail.headers, buildingMail.body.toString());
-												if(server.eventHandler.onMailComposed(this, buildingMail))
+												write("554 Transaction failed successfully");
+											}
+											else
+											{
+												final int sizeLimit = server.eventHandler.getSizeLimit(this);
+												if(sizeLimit >= 0 && body.length() > sizeLimit)
 												{
-													write("250 OK");
+													write("552 Your email is too big.");
 												}
 												else
 												{
-													write("553 Failed to deliver mail");
+													buildingMail.headers.put("date", SMTPContent.RFC2822.format(new Date()));
+													buildingMail.contents = SMTPContent.from(buildingMail.headers, bodystr);
+													if(sizeLimit >= 0 && buildingMail.getRawContents().length() > sizeLimit)
+													{
+														write("552 Your email is too big.");
+													}
+													else if(server.eventHandler.onMailComposed(this, buildingMail))
+													{
+														write("250 OK");
+													}
+													else
+													{
+														write("554 Failed to deliver mail");
+													}
 												}
-												buildingMail = null;
-												break;
 											}
-											mailLine = mailLine.substring(1);
+											buildingMail = null;
+											break;
 										}
-										buildingMail.body.append(mailLine).append("\n");
+										if(headersDefined)
+										{
+											body.append(mailLine.substring(1)).append("\n");
+										}
+									}
+									else if(headersDefined)
+									{
+										body.append(mailLine).append("\n");
 									}
 								}
 								while(!this.isInterrupted());
-								buildingMail = new SMTPMail();
+								buildingMail = null;
 							}
 						}
 						else if(line.toUpperCase().startsWith("HELP"))

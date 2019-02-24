@@ -43,7 +43,7 @@ public class SMTPAttachment extends SMTPContent
 	@Override
 	public String getBody()
 	{
-		return "content-type: " + type + "\ncontent-disposition: attachment" + (filename == null ? "" : "; filename=" + filename) + " \ncontent-transfer-encoding: base64\n\n" + Base64.getEncoder().encodeToString(bytes);
+		return "content-type: " + type + "\ncontent-disposition: attachment" + (filename == null ? "" : "; filename=" + filename) + " \r\ncontent-transfer-encoding: base64\r\n\r\n" + Base64.getEncoder().encodeToString(bytes);
 	}
 
 	@Override

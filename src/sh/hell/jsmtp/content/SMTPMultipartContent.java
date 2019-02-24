@@ -37,10 +37,10 @@ public class SMTPMultipartContent extends SMTPContent
 		synchronized(parts)
 		{
 			final StringBuilder body = new StringBuilder();
-			body.append("content-type: multipart/alternative; boundary=\"").append(boundary).append("\"\n\n");
+			body.append("content-type: multipart/alternative; boundary=\"").append(boundary).append("\"\r\ncontent-transfer-encoding: 7bit\r\n\r\n");
 			for(SMTPContent part : parts)
 			{
-				body.append("--").append(boundary).append("\n").append(part.getBody()).append("\n");
+				body.append("--").append(boundary).append("\r\n").append(part.getBody()).append("\r\n");
 			}
 			return body.append("--").append(boundary).append("--").toString();
 		}

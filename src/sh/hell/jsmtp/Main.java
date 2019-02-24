@@ -1,7 +1,7 @@
 package sh.hell.jsmtp;
 
+import sh.hell.jsmtp.content.SMTPMail;
 import sh.hell.jsmtp.server.SMTPEventHandler;
-import sh.hell.jsmtp.server.SMTPMail;
 import sh.hell.jsmtp.server.SMTPServer;
 import sh.hell.jsmtp.server.SMTPSession;
 

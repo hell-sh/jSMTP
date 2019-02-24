@@ -8,13 +8,13 @@ public class SMTPTextContent extends SMTPContent
 	public SMTPTextContent(String type, String body)
 	{
 		super(type.split(";")[0]);
-		this.body = body.replace("\r\n", "\n");
+		this.body = body.replace("\r\n", "\n").replace("\n", "\r\n");
 	}
 
 	@Override
 	public String getBody()
 	{
-		return "content-type: " + type + "; charset=\"UTF-8\"\ncontent-transfer-encoding: quoted-printable\n\n" + SMTPEncoding.QUOTED_PRINTABLE.encode(body);
+		return "content-type: " + type + "; charset=\"UTF-8\"\r\ncontent-transfer-encoding: quoted-printable\r\n\r\n" + SMTPEncoding.QUOTED_PRINTABLE.encode(body);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package sh.hell.jsmtp;
+package sh.hell.jsmtp.content;
 
 import sh.hell.jsmtp.exceptions.InvalidAddressException;
 
@@ -8,9 +8,16 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import java.util.Arrays;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SMTPAddress
 {
+	/**
+	 * The name of the entity that owns this address.
+	 */
 	public final String name;
+	/**
+	 * The email address.
+	 */
 	public final String mail;
 
 	public SMTPAddress(String mail) throws InvalidAddressException
@@ -101,14 +108,40 @@ public class SMTPAddress
 		return (name == null || !name.contains("<") && !name.contains(">") && !name.contains(",")) && !mail.contains("<") && !mail.contains(">") && !mail.contains(",");
 	}
 
-	public SMTPAddress validCopy() throws InvalidAddressException
+	/**
+	 * Returns a valid copy of the SMTPAddress.
+	 *
+	 * @return a valid copy of the SMTPAddress.
+	 */
+	public SMTPAddress validCopy()
 	{
-		return new SMTPAddress(name.replaceAll("<", "-").replaceAll(">", "-").replaceAll(",", ""), mail.replaceAll("<", "-").replaceAll(">", "-").replaceAll(",", ""));
+		try
+		{
+			return new SMTPAddress(name.replaceAll("<", "-").replaceAll(">", "-").replaceAll(",", ""), mail.replaceAll("<", "-").replaceAll(">", "-").replaceAll(",", ""));
+		}
+		catch(InvalidAddressException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	public SMTPAddress copy() throws InvalidAddressException
+	/**
+	 * Returns an unchanged copy of the SMTPAddress.
+	 *
+	 * @return an unchanged copy of the SMTPAddress.
+	 */
+	public SMTPAddress copy()
 	{
-		return new SMTPAddress(name, mail);
+		try
+		{
+			return new SMTPAddress(name, mail);
+		}
+		catch(InvalidAddressException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

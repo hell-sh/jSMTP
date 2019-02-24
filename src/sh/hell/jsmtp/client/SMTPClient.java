@@ -2,8 +2,8 @@ package sh.hell.jsmtp.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sh.hell.jsmtp.SMTPAddress;
-import sh.hell.jsmtp.content.SMTPContent;
+import sh.hell.jsmtp.content.SMTPAddress;
+import sh.hell.jsmtp.content.SMTPMail;
 import sh.hell.jsmtp.exceptions.SMTPException;
 import sh.hell.jsmtp.exceptions.TLSNegotiationFailedException;
 
@@ -20,9 +20,6 @@ import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 @SuppressWarnings({"WeakerAccess", "unused", "UnusedReturnValue"})
@@ -34,7 +31,6 @@ public class SMTPClient
 	public final String serverWelcomeMessage;
 	public String serverHostname;
 	public final ArrayList<String> serverCapabilities = new ArrayList<>();
-	public final HashMap<String, String> emailHeaders = new HashMap<>();
 	public final TrustManager[] trustManagers;
 	public Scanner scanner;
 	public OutputStreamWriter writer;
@@ -80,21 +76,10 @@ public class SMTPClient
 		this.trustManagers = trustManagers;
 	}
 
-	public static SMTPResponse sendMail(String from, String to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
+	public static SMTPResponse sendMail(SMTPMail mail) throws NamingException, IOException, SMTPException
 	{
-		return sendMail(SMTPAddress.fromText(from), SMTPAddress.fromText(to), subject, content);
-	}
-
-	public static SMTPResponse sendMail(SMTPAddress from, SMTPAddress to, String subject, SMTPContent content) throws NamingException, IOException, SMTPException
-	{
-		SMTPClient client = SMTPClient.fromAddress(to);
-		if(client == null)
-		{
-			throw new SMTPException("Unable to find server for " + to.mail);
-		}
-		SMTPResponse response = client.hello(from.getDomain()).from(from).to(to).subject(subject).send(content);
-		client.close();
-		return response;
+		//noinspection ConstantConditions
+		return SMTPClient.fromAddress(mail.recipients.get(0)).hello(mail.sender.getDomain()).send(mail);
 	}
 
 	public static SMTPClient fromAddress(SMTPAddress address) throws NamingException
@@ -212,8 +197,11 @@ public class SMTPClient
 
 	public SMTPClient write(String message) throws IOException
 	{
-		writer.write(message + "\r\n");
-		logger.debug(serverIP + " < " + message);
+		for(String line : message.split("\r\n"))
+		{
+			writer.write(line + "\r\n");
+			logger.debug(serverIP + " < " + line);
+		}
 		return this;
 	}
 
@@ -239,7 +227,7 @@ public class SMTPClient
 	/**
 	 * Sends EHLO (or HELO) to the server, and STARTTLS if supported.
 	 *
-	 * @param hostname The hostname of the machine sending the email.
+	 * @param hostname         The hostname of the machine sending the email.
 	 * @param ignoreEncryption Set to true to ignore STARTTLS capabilities.
 	 * @return this
 	 * @throws IOException   If writing fails.
@@ -318,30 +306,6 @@ public class SMTPClient
 		return this;
 	}
 
-	/**
-	 * Specifies the given address as the email sender, and starts TLS if the server requires it.
-	 *
-	 * @param smtpAddress The sender address.
-	 * @return this
-	 * @throws IOException   If writing fails.
-	 * @throws SMTPException If an SMTP protocol error occurred.
-	 */
-	public SMTPClient from(SMTPAddress smtpAddress) throws IOException, SMTPException
-	{
-		if(!smtpAddress.isValid())
-		{
-			smtpAddress = smtpAddress.validCopy();
-		}
-		write("MAIL FROM:<" + smtpAddress.mail + ">").flush();
-		addHeader("from", smtpAddress.toString());
-		SMTPResponse response = readResponse();
-		if(!response.status.equals("250"))
-		{
-			throw new SMTPException("Server denied " + smtpAddress.mail + " as sender address: " + response.toString());
-		}
-		return this;
-	}
-
 	public boolean verify(SMTPAddress address) throws IOException, SMTPException
 	{
 		write("VRFY " + address.toString()).flush();
@@ -357,146 +321,57 @@ public class SMTPClient
 		return false;
 	}
 
-	public SMTPClient to(SMTPAddress smtpAddress) throws IOException, SMTPException
+	public SMTPResponse send(SMTPMail mail) throws IOException, SMTPException
 	{
-		if(!smtpAddress.isValid())
+		final String rawContents = mail.getRawContents();
+		final int size = rawContents.length();
+		boolean supportsSize = false;
+		for(String serverCapability : serverCapabilities)
 		{
-			smtpAddress = smtpAddress.validCopy();
+			if(serverCapability.equals("SIZE"))
+			{
+				supportsSize = true;
+			}
+			else if(serverCapability.startsWith("SIZE "))
+			{
+				supportsSize = true;
+				try
+				{
+					final int sizeLimit = Integer.parseInt(serverCapability.substring(5));
+					if(sizeLimit > 0 && sizeLimit < size)
+					{
+						throw new SMTPException("Our email is too big for the server.");
+					}
+				}
+				catch(NumberFormatException ignored)
+				{
+
+				}
+				break;
+			}
 		}
-		write("RCPT TO:<" + smtpAddress.mail + ">").flush();
+		write("MAIL FROM:<" + mail.sender.mail + ">" + (supportsSize ? " SIZE=" + size : "")).flush();
 		SMTPResponse response = readResponse();
 		if(!response.status.equals("250"))
 		{
-			throw new SMTPException("Server denied " + smtpAddress.mail + " as recipient: " + response.toString());
+			throw new SMTPException("Server denied " + mail.sender.toString() + " as sender address: " + response.toString());
 		}
-		synchronized(emailHeaders)
+		for(SMTPAddress recipient : mail.recipients)
 		{
-			if(emailHeaders.containsKey("to"))
+			write("RCPT TO:<" + recipient.mail + ">").flush();
+			response = readResponse();
+			if(!response.status.equals("250"))
 			{
-				addHeader("cc", smtpAddress.toString());
-			}
-			else
-			{
-				emailHeaders.put("to", smtpAddress.toString());
+				throw new SMTPException("Server denied " + recipient.mail + " as recipient: " + response.toString());
 			}
 		}
-		return this;
-	}
-
-	public SMTPClient cc(SMTPAddress smtpAddress) throws IOException, SMTPException
-	{
-		return this.to(smtpAddress);
-	}
-
-	public SMTPClient bcc(SMTPAddress smtpAddress) throws IOException, SMTPException
-	{
-		if(!smtpAddress.isValid())
-		{
-			smtpAddress = smtpAddress.validCopy();
-		}
-		write("RCPT TO:<" + smtpAddress.mail + ">").flush();
-		SMTPResponse response = readResponse();
-		if(!response.status.equals("250"))
-		{
-			throw new SMTPException("Server denied " + smtpAddress.mail + " as recipient: " + response);
-		}
-		return this;
-	}
-
-	/**
-	 * Sets the subject header or appends to it if already present.
-	 *
-	 * @param subject The subject of the email.
-	 * @return this
-	 */
-	public SMTPClient subject(String subject)
-	{
-		try
-		{
-			return this.addHeader("subject", subject);
-		}
-		catch(SMTPException ignored)
-		{
-		}
-		return this;
-	}
-
-	/**
-	 * Creates a header or appends to its value if it already exists.
-	 *
-	 * @param name  The name of the header.
-	 * @param value The value of the header.
-	 * @return this
-	 * @throws SMTPException If the header name contains a colon, making it invalid.
-	 */
-	public SMTPClient addHeader(String name, String value) throws SMTPException
-	{
-		if(name.contains(":"))
-		{
-			throw new SMTPException("Invalid header name: " + name);
-		}
-		name = name.toLowerCase();
-		synchronized(emailHeaders)
-		{
-			if(emailHeaders.containsKey(name))
-			{
-				emailHeaders.put(name, emailHeaders.get(name) + ", " + value);
-			}
-			else
-			{
-				emailHeaders.put(name, value);
-			}
-		}
-		return this;
-	}
-
-	public SMTPClient removeHeader(String name)
-	{
-		synchronized(emailHeaders)
-		{
-			emailHeaders.remove(name);
-		}
-		return this;
-	}
-
-	public SMTPResponse send(SMTPContent _body) throws IOException, SMTPException
-	{
 		write("DATA").flush();
-		SMTPResponse response = readResponse();
+		response = readResponse();
 		if(!response.status.equals("354"))
 		{
 			throw new SMTPException("Invalid response to DATA: " + response);
 		}
-		synchronized(emailHeaders)
-		{
-			if(!emailHeaders.containsKey("date"))
-			{
-				emailHeaders.put("date", SMTPContent.RFC2822.format(new Date()));
-			}
-			if(!emailHeaders.containsKey("mime-version"))
-			{
-				emailHeaders.put("mime-version", "1.0");
-			}
-			emailHeaders.remove("content-type");
-			emailHeaders.remove("content-transfer-encoding");
-			for(Map.Entry<String, String> header : emailHeaders.entrySet())
-			{
-				write(header.getKey() + ": " + header.getValue());
-			}
-		}
-		final String body = _body.getBody();
-		for(String line : body.split("\n"))
-		{
-			if(line.startsWith("."))
-			{
-				write("." + line);
-			}
-			else
-			{
-				write(line);
-			}
-		}
-		write(".").flush();
+		write(rawContents).write(".").flush();
 		response = readResponse();
 		if(!response.status.equals("250"))
 		{

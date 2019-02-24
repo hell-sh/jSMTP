@@ -20,25 +20,17 @@
 var methods = {
 	"i0": 10,
 	"i1": 10,
-	"i2": 10,
-	"i3": 10,
+	"i2": 9,
+	"i3": 9,
 	"i4": 10,
 	"i5": 10,
-	"i6": 9,
-	"i7": 9,
+	"i6": 10,
+	"i7": 10,
 	"i8": 10,
 	"i9": 10,
-	"i10": 10,
+	"i10": 9,
 	"i11": 10,
-	"i12": 10,
-	"i13": 10,
-	"i14": 10,
-	"i15": 9,
-	"i16": 9,
-	"i17": 10,
-	"i18": 10,
-	"i19": 10,
-	"i20": 10
+	"i12": 10
 };
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
@@ -150,46 +142,42 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Field and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>java.util.HashMap&lt;java.lang.String,java.lang.String&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#emailHeaders">emailHeaders</a></span></code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#extendedSMTP">extendedSMTP</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+    <tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hostname">hostname</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+    <tr class="altColor">
 <td class="colFirst"><code>java.util.Scanner</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#scanner">scanner</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+    <tr class="rowColor">
 <td class="colFirst"><code>java.util.ArrayList&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#serverCapabilities">serverCapabilities</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+    <tr class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#serverHostname">serverHostname</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+    <tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#serverIP">serverIP</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+    <tr class="altColor">
 <td class="colFirst"><code>short</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#serverPort">serverPort</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+    <tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#serverWelcomeMessage">serverWelcomeMessage</a></span></code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+    <tr class="altColor">
 <td class="colFirst"><code>javax.net.ssl.TrustManager[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#trustManagers">trustManagers</a></span></code>&nbsp;</td>
 </tr>
-<tr class="altColor">
+    <tr class="rowColor">
 <td class="colFirst"><code>java.io.OutputStreamWriter</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#writer">writer</a></span></code>&nbsp;</td>
 </tr>
@@ -232,106 +220,75 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#addHeader-java.lang.String-java.lang.String-">addHeader</a></span>(java.lang.String&nbsp;name,
-         java.lang.String&nbsp;value)</code>
-<div class="block">Creates a header or appends to its value if it already exists.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#bcc-sh.hell.jsmtp.SMTPAddress-">bcc</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)</code>&nbsp;</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#cc-sh.hell.jsmtp.SMTPAddress-">cc</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)</code>&nbsp;</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#close--">close</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i4" class="altColor">
+    <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#flush--">flush</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#from-sh.hell.jsmtp.SMTPAddress-">from</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)</code>
-<div class="block">Specifies the given address as the email sender, and starts TLS if the server requires it.</div>
-</td>
-</tr>
-<tr id="i6" class="altColor">
+    <tr id="i2" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#fromAddress-sh.hell.jsmtp.SMTPAddress-">fromAddress</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;address)</code>&nbsp;</td>
+        <td class="colLast"><code><span class="memberNameLink"><a
+                href="../../../../sh/hell/jsmtp/client/SMTPClient.html#fromAddress-sh.hell.jsmtp.content.SMTPAddress-">fromAddress</a></span>(<a
+                href="../../../../sh/hell/jsmtp/content/SMTPAddress.html" title="class in sh.hell.jsmtp.content">SMTPAddress</a>&nbsp;address)</code>&nbsp;
+        </td>
 </tr>
-<tr id="i7" class="rowColor">
+    <tr id="i3" class="rowColor">
 <td class="colFirst"><code>static <a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#fromServer-java.lang.String-">fromServer</a></span>(java.lang.String&nbsp;serverIP)</code>&nbsp;</td>
 </tr>
-<tr id="i8" class="altColor">
+    <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-">hello</a></span>(java.lang.String&nbsp;hostname)</code>
     <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
 </td>
 </tr>
-<tr id="i9" class="rowColor">
-    <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html"
-                                  title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-    <td class="colLast"><code><span class="memberNameLink"><a
-            href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-boolean-">hello</a></span>(java.lang.String&nbsp;hostname,
-        boolean&nbsp;ignoreEncryption)</code>
-        <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
-    </td>
+    <tr id="i5" class="rowColor">
+        <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html"
+                                      title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
+        <td class="colLast"><code><span class="memberNameLink"><a
+                href="../../../../sh/hell/jsmtp/client/SMTPClient.html#hello-java.lang.String-boolean-">hello</a></span>(java.lang.String&nbsp;hostname,
+            boolean&nbsp;ignoreEncryption)</code>
+            <div class="block">Sends EHLO (or HELO) to the server, and STARTTLS if supported.</div>
+        </td>
 </tr>
-    <tr id="i10" class="altColor">
+    <tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#isEncrypted--">isEncrypted</a></span>()</code>&nbsp;</td>
 </tr>
-    <tr id="i11" class="rowColor">
+    <tr id="i7" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#isOpen--">isOpen</a></span>()</code>&nbsp;</td>
 </tr>
-    <tr id="i12" class="altColor">
+    <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#readResponse--">readResponse</a></span>()</code>&nbsp;</td>
 </tr>
-    <tr id="i13" class="rowColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#removeHeader-java.lang.String-">removeHeader</a></span>(java.lang.String&nbsp;name)</code>&nbsp;</td>
-</tr>
-    <tr id="i14" class="altColor">
+    <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#send-sh.hell.jsmtp.content.SMTPContent-">send</a></span>(<a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;_body)</code>&nbsp;</td>
+        <td class="colLast"><code><span class="memberNameLink"><a
+                href="../../../../sh/hell/jsmtp/client/SMTPClient.html#send-sh.hell.jsmtp.content.SMTPMail-">send</a></span>(<a
+                href="../../../../sh/hell/jsmtp/content/SMTPMail.html"
+                title="class in sh.hell.jsmtp.content">SMTPMail</a>&nbsp;mail)</code>&nbsp;
+        </td>
 </tr>
-    <tr id="i15" class="rowColor">
+    <tr id="i10" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#sendMail-sh.hell.jsmtp.SMTPAddress-sh.hell.jsmtp.SMTPAddress-java.lang.String-sh.hell.jsmtp.content.SMTPContent-">sendMail</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;from,
-        <a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;to,
-        java.lang.String&nbsp;subject,
-        <a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;content)</code>&nbsp;</td>
+        <td class="colLast"><code><span class="memberNameLink"><a
+                href="../../../../sh/hell/jsmtp/client/SMTPClient.html#sendMail-sh.hell.jsmtp.content.SMTPMail-">sendMail</a></span>(<a
+                href="../../../../sh/hell/jsmtp/content/SMTPMail.html"
+                title="class in sh.hell.jsmtp.content">SMTPMail</a>&nbsp;mail)</code>&nbsp;
+        </td>
 </tr>
-    <tr id="i16" class="altColor">
-<td class="colFirst"><code>static <a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#sendMail-java.lang.String-java.lang.String-java.lang.String-sh.hell.jsmtp.content.SMTPContent-">sendMail</a></span>(java.lang.String&nbsp;from,
-        java.lang.String&nbsp;to,
-        java.lang.String&nbsp;subject,
-        <a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;content)</code>&nbsp;</td>
-</tr>
-<tr id="i17" class="rowColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#subject-java.lang.String-">subject</a></span>(java.lang.String&nbsp;subject)</code>
-<div class="block">Sets the subject header or appends to it if already present.</div>
-</td>
-</tr>
-    <tr id="i18" class="altColor">
-<td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#to-sh.hell.jsmtp.SMTPAddress-">to</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)</code>&nbsp;</td>
-</tr>
-    <tr id="i19" class="rowColor">
+    <tr id="i11" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#verify-sh.hell.jsmtp.SMTPAddress-">verify</a></span>(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;address)</code>&nbsp;</td>
+        <td class="colLast"><code><span class="memberNameLink"><a
+                href="../../../../sh/hell/jsmtp/client/SMTPClient.html#verify-sh.hell.jsmtp.content.SMTPAddress-">verify</a></span>(<a
+                href="../../../../sh/hell/jsmtp/content/SMTPAddress.html" title="class in sh.hell.jsmtp.content">SMTPAddress</a>&nbsp;address)</code>&nbsp;
+        </td>
 </tr>
-    <tr id="i20" class="altColor">
+    <tr id="i12" class="altColor">
 <td class="colFirst"><code><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../sh/hell/jsmtp/client/SMTPClient.html#write-java.lang.String-">write</a></span>(java.lang.String&nbsp;message)</code>&nbsp;</td>
 </tr>
@@ -400,15 +357,6 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>serverCapabilities</h4>
 <pre>public final&nbsp;java.util.ArrayList&lt;java.lang.String&gt; serverCapabilities</pre>
-</li>
-</ul>
-<a name="emailHeaders">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>emailHeaders</h4>
-<pre>public final&nbsp;java.util.HashMap&lt;java.lang.String,java.lang.String&gt; emailHeaders</pre>
 </li>
 </ul>
 <a name="trustManagers">
@@ -507,16 +455,15 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="sendMail-java.lang.String-java.lang.String-java.lang.String-sh.hell.jsmtp.content.SMTPContent-">
+    <a name="sendMail-sh.hell.jsmtp.content.SMTPMail-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>sendMail</h4>
-<pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;sendMail(java.lang.String&nbsp;from,
-                                    java.lang.String&nbsp;to,
-                                    java.lang.String&nbsp;subject,
-                                    <a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;content)
+    <pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html"
+                               title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;sendMail(<a
+            href="../../../../sh/hell/jsmtp/content/SMTPMail.html" title="class in sh.hell.jsmtp.content">SMTPMail</a>&nbsp;mail)
                              throws javax.naming.NamingException,
                                     java.io.IOException,
                                     <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
@@ -528,34 +475,16 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="sendMail-sh.hell.jsmtp.SMTPAddress-sh.hell.jsmtp.SMTPAddress-java.lang.String-sh.hell.jsmtp.content.SMTPContent-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>sendMail</h4>
-<pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;sendMail(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;from,
-                                    <a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;to,
-                                    java.lang.String&nbsp;subject,
-                                    <a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;content)
-                             throws javax.naming.NamingException,
-                                    java.io.IOException,
-                                    <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<dl>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>javax.naming.NamingException</code></dd>
-<dd><code>java.io.IOException</code></dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
-</dl>
-</li>
-</ul>
-<a name="fromAddress-sh.hell.jsmtp.SMTPAddress-">
+    <a name="fromAddress-sh.hell.jsmtp.content.SMTPAddress-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>fromAddress</h4>
-<pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;fromAddress(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;address)
+    <pre>public static&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html"
+                               title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;fromAddress(<a
+            href="../../../../sh/hell/jsmtp/content/SMTPAddress.html"
+            title="class in sh.hell.jsmtp.content">SMTPAddress</a>&nbsp;address)
                               throws javax.naming.NamingException</pre>
 <dl>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -679,30 +608,6 @@ extends java.lang.Object</pre>
     <dt><span class="paramLabel">Parameters:</span></dt>
     <dd><code>hostname</code> - The hostname of the machine sending the email.</dd>
     <dd><code>ignoreEncryption</code> - Set to true to ignore STARTTLS capabilities.</dd>
-    <dt><span class="returnLabel">Returns:</span></dt>
-    <dd>this</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-    <dd><code>java.io.IOException</code> - If writing fails.</dd>
-    <dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html"
-                 title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code> - If an SMTP protocol error
-        occurred.
-    </dd>
-</dl>
-</li>
-</ul>
-<a name="from-sh.hell.jsmtp.SMTPAddress-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>from</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;from(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)
-                throws java.io.IOException,
-                       <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<div class="block">Specifies the given address as the email sender, and starts TLS if the server requires it.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>smtpAddress</code> - The sender address.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>this</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -711,13 +616,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="verify-sh.hell.jsmtp.SMTPAddress-">
+    <a name="verify-sh.hell.jsmtp.content.SMTPAddress-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>verify</h4>
-<pre>public&nbsp;boolean&nbsp;verify(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;address)
+    <pre>public&nbsp;boolean&nbsp;verify(<a href="../../../../sh/hell/jsmtp/content/SMTPAddress.html"
+                                            title="class in sh.hell.jsmtp.content">SMTPAddress</a>&nbsp;address)
                throws java.io.IOException,
                       <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
 <dl>
@@ -727,107 +633,14 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="to-sh.hell.jsmtp.SMTPAddress-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>to</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;to(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)
-              throws java.io.IOException,
-                     <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<dl>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.io.IOException</code></dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
-</dl>
-</li>
-</ul>
-<a name="cc-sh.hell.jsmtp.SMTPAddress-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>cc</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;cc(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)
-              throws java.io.IOException,
-                     <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<dl>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.io.IOException</code></dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
-</dl>
-</li>
-</ul>
-<a name="bcc-sh.hell.jsmtp.SMTPAddress-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>bcc</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;bcc(<a href="../../../../sh/hell/jsmtp/SMTPAddress.html" title="class in sh.hell.jsmtp">SMTPAddress</a>&nbsp;smtpAddress)
-               throws java.io.IOException,
-                      <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<dl>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code>java.io.IOException</code></dd>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code></dd>
-</dl>
-</li>
-</ul>
-<a name="subject-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>subject</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;subject(java.lang.String&nbsp;subject)</pre>
-<div class="block">Sets the subject header or appends to it if already present.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>subject</code> - The subject of the email.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>this</dd>
-</dl>
-</li>
-</ul>
-<a name="addHeader-java.lang.String-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addHeader</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;addHeader(java.lang.String&nbsp;name,
-                            java.lang.String&nbsp;value)
-                     throws <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
-<div class="block">Creates a header or appends to its value if it already exists.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>name</code> - The name of the header.</dd>
-<dd><code>value</code> - The value of the header.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>this</dd>
-<dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></code> - If the header name contains a colon, making it invalid.</dd>
-</dl>
-</li>
-</ul>
-<a name="removeHeader-java.lang.String-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>removeHeader</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPClient.html" title="class in sh.hell.jsmtp.client">SMTPClient</a>&nbsp;removeHeader(java.lang.String&nbsp;name)</pre>
-</li>
-</ul>
-<a name="send-sh.hell.jsmtp.content.SMTPContent-">
+    <a name="send-sh.hell.jsmtp.content.SMTPMail-">
 <!--   -->
 </a>
     <ul class="blockListLast">
 <li class="blockList">
 <h4>send</h4>
-<pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;send(<a href="../../../../sh/hell/jsmtp/content/SMTPContent.html" title="class in sh.hell.jsmtp.content">SMTPContent</a>&nbsp;_body)
+    <pre>public&nbsp;<a href="../../../../sh/hell/jsmtp/client/SMTPResponse.html" title="class in sh.hell.jsmtp.client">SMTPResponse</a>&nbsp;send(<a
+            href="../../../../sh/hell/jsmtp/content/SMTPMail.html" title="class in sh.hell.jsmtp.content">SMTPMail</a>&nbsp;mail)
                   throws java.io.IOException,
                          <a href="../../../../sh/hell/jsmtp/exceptions/SMTPException.html" title="class in sh.hell.jsmtp.exceptions">SMTPException</a></pre>
 <dl>

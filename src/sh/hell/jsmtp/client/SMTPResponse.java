@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class SMTPResponse
 {
-	final String status;
-	final ArrayList<String> lines = new ArrayList<>();
+	public final String status;
+	public final ArrayList<String> lines = new ArrayList<>();
 
 	SMTPResponse(String line)
 	{

@@ -11,9 +11,14 @@ public abstract class SMTPContent
 	public static final SimpleDateFormat RFC2822 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
 	public final String type;
 
-	SMTPContent(String type)
+	public SMTPContent(String type)
 	{
 		this.type = type;
+	}
+
+	public SMTPContent()
+	{
+		this(null);
 	}
 
 	private static boolean readPart(Scanner scanner, String boundary, HashMap<String, String> headers, StringBuilder partBody)
@@ -63,6 +68,13 @@ public abstract class SMTPContent
 		return isEnd;
 	}
 
+	/**
+	 * Converts an email's headers & body into its SMTPContent representation.
+	 *
+	 * @param headers The headers of the email.
+	 * @param body    The body of the email.
+	 * @return The email's SMTPContent representation.
+	 */
 	public static SMTPContent from(HashMap<String, String> headers, String body)
 	{
 		SMTPEncoding encoding = SMTPEncoding.SEVENBIT;
