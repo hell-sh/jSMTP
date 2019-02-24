@@ -1,6 +1,7 @@
 package sh.hell.jsmtp.content;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public enum SMTPEncoding
@@ -34,15 +35,15 @@ public enum SMTPEncoding
 		if(this == QUOTED_PRINTABLE)
 		{
 			StringBuilder str = new StringBuilder();
-			for(char c : text.toCharArray())
+			for(byte b : text.getBytes(StandardCharsets.UTF_8))
 			{
-				if((c < 33 || c > 126 || c == 61) && c != 13 && c != 10)
+				if((b < 33 || b > 126 || b == 61) && b != 9 && b != 32)
 				{
-					str.append("=").append(String.format("%2X", (byte) c).replace(" ", "0"));
+					str.append("=").append(String.format("%2X", b).replace(" ", "0"));
 				}
 				else
 				{
-					str.append(c);
+					str.append((char) b);
 				}
 			}
 			return str.toString();
@@ -58,39 +59,39 @@ public enum SMTPEncoding
 	{
 		if(this == QUOTED_PRINTABLE)
 		{
-			StringBuilder str = new StringBuilder();
 			int decoding = 0;
+			final ArrayList<Byte> content = new ArrayList<>();
 			StringBuilder decodeChars = new StringBuilder();
 			for(char c : text.toCharArray())
 			{
 				if(decoding > 0)
 				{
-					if(c > 32 && c < 127 && c != 61)
+					decodeChars.append(c);
+					if(decoding++ >= 2)
 					{
-						decodeChars.append(c);
-						if(decoding != 2)
-						{
-							decoding++;
-							continue;
-						}
-						str.append((char) Integer.parseInt(decodeChars.toString(), 16));
+						content.add((byte) Integer.parseInt(decodeChars.toString(), 16));
+						decoding = 0;
+						decodeChars = new StringBuilder();
 					}
-					decoding = 0;
-					decodeChars = new StringBuilder();
 				}
 				else
 				{
-					if(c == 61) // =
+					if(c == '=')
 					{
 						decoding = 1;
 					}
 					else
 					{
-						str.append(c);
+						content.add((byte) c);
 					}
 				}
 			}
-			return str.toString();
+			byte[] bytearr = new byte[content.size()];
+			for(int i = 0; i < content.size(); i++)
+			{
+				bytearr[i] = content.get(i);
+			}
+			return new String(bytearr, StandardCharsets.UTF_8);
 		}
 		else if(this == BASE64)
 		{

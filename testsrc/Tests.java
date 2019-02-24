@@ -21,10 +21,10 @@ public class Tests
 	@Test(timeout = 1000L)
 	public void testEncodingAndDecoding()
 	{
-		final String text = "Hêlló, wörld!\n\n.\n";
-		assertEquals(text, SMTPEncoding.EIGHTBIT.decode(SMTPEncoding.EIGHTBIT.encode(text)));
-		assertEquals(text, SMTPEncoding.QUOTED_PRINTABLE.decode(SMTPEncoding.QUOTED_PRINTABLE.encode(text)));
-		assertEquals(text, SMTPEncoding.BASE64.decode(SMTPEncoding.BASE64.encode(text)));
+		assertEquals("H=C3=AAll=C3=B3, w=C3=B6rld!", SMTPEncoding.QUOTED_PRINTABLE.encode("Hêlló, wörld!"));
+		assertEquals("Hêlló, wörld!", SMTPEncoding.QUOTED_PRINTABLE.decode("H=C3=AAll=C3=B3, w=C3=B6rld!"));
+		assertEquals("SMOqbGzDsywgd8O2cmxkIQ==", SMTPEncoding.BASE64.encode("Hêlló, wörld!"));
+		assertEquals("Hêlló, wörld!", SMTPEncoding.BASE64.decode("SMOqbGzDsywgd8O2cmxkIQ=="));
 	}
 
 	@Test(timeout = 5000L)

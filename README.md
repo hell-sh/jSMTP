@@ -16,7 +16,7 @@ jSMTP is using slf4j, so Maven is the best way to include jSMTP:
         <dependency>
             <groupId>sh.hell</groupId>
             <artifactId>jsmtp</artifactId>
-            <version>[1.0.0,2.0.0)</version>
+            <version>[1.0.1,2.0.0)</version>
         </dependency>
     </dependencies>
 
