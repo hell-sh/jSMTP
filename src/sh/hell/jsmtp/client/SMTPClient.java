@@ -78,11 +78,17 @@ public class SMTPClient
 
 	public static SMTPResponse sendMail(SMTPMail mail) throws NamingException, IOException, SMTPException
 	{
-		//noinspection ConstantConditions
 		return SMTPClient.fromAddress(mail.recipients.get(0)).hello(mail.sender.getDomain()).send(mail);
 	}
 
-	public static SMTPClient fromAddress(SMTPAddress address) throws NamingException
+	/**
+	 * Returns an SMTPClient connected to a server responsible for the given address.
+	 *
+	 * @return An SMTPClient connected to a server responsible for the given address.
+	 * @throws NamingException When a DNS error occurred.
+	 * @throws SMTPException   When no server responsible for the address was found.
+	 */
+	public static SMTPClient fromAddress(SMTPAddress address) throws NamingException, SMTPException
 	{
 		for(String server : address.getMailServers())
 		{
@@ -92,8 +98,7 @@ public class SMTPClient
 				return client;
 			}
 		}
-		logger.error("Didn't find any server for " + address + ".");
-		return null;
+		throw new SMTPException("Failed to connect to a server responsible for " + address.toString());
 	}
 
 	public static SMTPClient fromServer(String serverIP)
@@ -161,6 +166,11 @@ public class SMTPClient
 		return socket instanceof SSLSocket;
 	}
 
+	public boolean isLocal()
+	{
+		return socket.getRemoteSocketAddress().toString().startsWith("localhost");
+	}
+
 	public SMTPResponse readResponse() throws SMTPException
 	{
 		int tries = 0;
@@ -214,26 +224,12 @@ public class SMTPClient
 	/**
 	 * Sends EHLO (or HELO) to the server, and STARTTLS if supported.
 	 *
-	 * @param hostname The hostname of the machine sending the email.
+	 * @param hostname       The hostname of this machine.
 	 * @return this
-	 * @throws IOException   If writing fails.
-	 * @throws SMTPException If an SMTP protocol error occurred.
+	 * @throws IOException   When writing fails.
+	 * @throws SMTPException When an SMTP protocol error occurred.
 	 */
-	public SMTPClient hello(String hostname) throws IOException, SMTPException
-	{
-		return this.hello(hostname, false);
-	}
-
-	/**
-	 * Sends EHLO (or HELO) to the server, and STARTTLS if supported.
-	 *
-	 * @param hostname         The hostname of the machine sending the email.
-	 * @param ignoreEncryption Set to true to ignore STARTTLS capabilities.
-	 * @return this
-	 * @throws IOException   If writing fails.
-	 * @throws SMTPException If an SMTP protocol error occurred.
-	 */
-	public SMTPClient hello(String hostname, boolean ignoreEncryption) throws SMTPException, IOException
+	public SMTPClient hello(String hostname) throws SMTPException, IOException
 	{
 		SMTPResponse response = null;
 		if(extendedSMTP)
@@ -262,7 +258,7 @@ public class SMTPClient
 				{
 					this.serverCapabilities.add(response.lines.get(i).toUpperCase());
 				}
-				if(!ignoreEncryption && !isEncrypted() && serverCapabilities.contains("STARTTLS"))
+				if(!isEncrypted() && !isLocal() && serverCapabilities.contains("STARTTLS"))
 				{
 					write("STARTTLS").flush();
 					SMTPResponse starttls_response = readResponse();
@@ -285,7 +281,7 @@ public class SMTPClient
 							this.socket = sslSocket;
 							this.scanner = new Scanner(new InputStreamReader(socket.getInputStream())).useDelimiter("\r\n");
 							this.writer = new OutputStreamWriter(socket.getOutputStream());
-							this.hello(hostname, true);
+							this.hello(hostname);
 						}
 						catch(IOException | GeneralSecurityException e)
 						{
@@ -306,15 +302,23 @@ public class SMTPClient
 		return this;
 	}
 
+	/**
+	 * Asks the server if the given address exists on it.
+	 *
+	 * @return If the server can deliver to the given address.
+	 * @throws IOException   When writing fails.
+	 * @throws SMTPException When the VRFY command is not implemented or there is another SMTP protocol error.
+	 */
 	public boolean verify(SMTPAddress address) throws IOException, SMTPException
 	{
+		// Server capabilities are not checked because not all servers that implement VRFY advertise it as a feature.
 		write("VRFY " + address.toString()).flush();
 		SMTPResponse response = readResponse();
 		if(response.status.equals("250"))
 		{
 			return true;
 		}
-		else if(response.status.equals("501"))
+		else if(response.status.equals("500") || response.status.equals("501") || response.status.equals("502"))
 		{
 			throw new SMTPException("Couldn't verify " + address.toString() + ": " + response.toString());
 		}
@@ -340,12 +344,11 @@ public class SMTPClient
 					final int sizeLimit = Integer.parseInt(serverCapability.substring(5));
 					if(sizeLimit > 0 && sizeLimit < size)
 					{
-						throw new SMTPException("Our email is too big for the server.");
+						throw new SMTPException("Your email is too big for the server.");
 					}
 				}
 				catch(NumberFormatException ignored)
 				{
-
 				}
 				break;
 			}
@@ -354,7 +357,7 @@ public class SMTPClient
 		SMTPResponse response = readResponse();
 		if(!response.status.equals("250"))
 		{
-			throw new SMTPException("Server denied " + mail.sender.toString() + " as sender address: " + response.toString());
+			throw new SMTPException("The server denied " + mail.sender.toString() + " as sender: " + response.toString());
 		}
 		for(SMTPAddress recipient : mail.recipients)
 		{
@@ -362,20 +365,20 @@ public class SMTPClient
 			response = readResponse();
 			if(!response.status.equals("250"))
 			{
-				throw new SMTPException("Server denied " + recipient.mail + " as recipient: " + response.toString());
+				throw new SMTPException("The server denied " + recipient.toString() + " as recipient: " + response.toString());
 			}
 		}
 		write("DATA").flush();
 		response = readResponse();
 		if(!response.status.equals("354"))
 		{
-			throw new SMTPException("Invalid response to DATA: " + response);
+			throw new SMTPException("The server sent an invalid response to DATA: " + response);
 		}
 		write(rawContents).write(".").flush();
 		response = readResponse();
 		if(!response.status.equals("250"))
 		{
-			throw new SMTPException("Server refused to accept email: " + response);
+			throw new SMTPException("The server refused to accept your email: " + response);
 		}
 		return response;
 	}

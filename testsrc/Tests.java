@@ -111,7 +111,7 @@ public class Tests
 		assertTrue(client.isOpen());
 		assertEquals("Wêlcömé", client.serverWelcomeMessage);
 		// Identifying
-		client.hello("localhost", System.getProperty("java.version").startsWith("11")); // TLS from localhost to localhost doesn't work starting in Java 11, but "testClientAgainstRemoteServer" above ensures that encryption works (at least in the client).
+		client.hello("localhost");
 		assertTrue(client.extendedSMTP);
 		assertEquals("localhost", client.serverHostname);
 		// Define recipient before sender was set

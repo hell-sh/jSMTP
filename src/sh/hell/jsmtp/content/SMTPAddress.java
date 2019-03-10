@@ -1,11 +1,14 @@
 package sh.hell.jsmtp.content;
 
+import sh.hell.jsmtp.client.SMTPClient;
 import sh.hell.jsmtp.exceptions.InvalidAddressException;
+import sh.hell.jsmtp.exceptions.SMTPException;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
+import java.io.IOException;
 import java.util.Arrays;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -100,6 +103,19 @@ public class SMTPAddress
 			sortedHostNames[i] = pvhn[i][1].endsWith(".") ? pvhn[i][1].substring(0, pvhn[i][1].length() - 1) : pvhn[i][1];
 		}
 		return sortedHostNames;
+	}
+
+	/**
+	 * Connects to a server responsible for this address, and asks about this email address.
+	 *
+	 * @return True if a server responsible for this address knows about it.
+	 * @throws NamingException When a DNS error occurred.
+	 * @throws IOException     When writing fails.
+	 * @throws SMTPException   When the VRFY command is not implemented or there is another SMTP protocol error.
+	 */
+	public boolean verify() throws NamingException, IOException, SMTPException
+	{
+		return SMTPClient.fromAddress(this).verify(this);
 	}
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
