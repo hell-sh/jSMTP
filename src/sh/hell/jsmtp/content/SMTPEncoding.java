@@ -37,7 +37,7 @@ public enum SMTPEncoding
 			StringBuilder str = new StringBuilder();
 			for(byte b : text.getBytes(StandardCharsets.UTF_8))
 			{
-				if((b < 33 || b > 126 || b == 61) && b != 9 && b != 32)
+				if((b < 32 || b > 126 || b == 61) && b != 9)
 				{
 					str.append("=").append(String.format("%2X", b).replace(" ", "0"));
 				}
